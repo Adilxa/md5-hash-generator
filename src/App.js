@@ -24,9 +24,8 @@ const App = () => {
   return (
     <div className="main">
       <div className="window">
-        <input type="file" onChange={handleFileUpload} />
+        <input type="file" onChange={handleFileUpload}  />
         <h1>md5: {data}</h1>
-        <h1>Text in file: {text}</h1>
         <button onClick={() => onSave(text)}>Convert to md5</button>
       </div>
     </div>
