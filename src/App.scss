@@ -14,7 +14,7 @@
   justify-content: center;
   .window {
     width: fit-content;
-    min-width: 25%;
+    min-width: 40%;
     min-height: 30%;
     height: fit-content;
     background-color: #fff;
@@ -22,14 +22,14 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: space-between;
     h1 {
       display: flex;
     }
     input {
       width: fit-content;
-      background-color: white;
-      transform: scale(1.5);
+      transform: scale(1.2);
       margin-left: 20%;
     }
     button {
@@ -48,3 +48,4 @@
     }
   }
 }
+
