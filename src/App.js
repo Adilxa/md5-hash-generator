@@ -1,12 +1,13 @@
 import CryptoJS from "crypto-js";
 import { useState, useEffect } from "react";
 import "./App.scss";
+import MyChart from "./MyChart";
 
 const App = () => {
 	const [prvData, setPrvData] = useState("00000000000000000000000000000000"); // prev data
 	const [prvArr, setPrvArr] = useState([]);
 	const [data, setData] = useState("00000000000000000000000000000000"); // is for md5
-	const [Arr, setArr] = useState([]); // the Arr for the graph and bit count. 
+	const [Arr, setArr] = useState([]); // the Arr for the graph and bit count.
 	const [text, setText] = useState(); // is for the text
 	const [textArea, setTextArea] = useState();
 	const [isHovering, setIsHovering] = useState(false);
@@ -14,7 +15,7 @@ const App = () => {
 
 	useEffect(() => {
 		onSave(text);
-		console.log(data, "----", prvData);
+		// console.log(data, "----", prvData);
 	});
 
 	async function countArr(hash, sums, handeler) {
@@ -28,8 +29,8 @@ const App = () => {
 		}
 		await handeler(sums);
 	}
-	console.log(prvArr, "---------", Arr);
-	async function handleInputChange (event) {
+	// console.log(prvArr, "---------", Arr);
+	async function handleInputChange(event) {
 		setPrvData(data); // Store the previous hash value.
 		setTextArea(event.target.value);
 		setText(event.target.value);
@@ -37,7 +38,7 @@ const App = () => {
 		await countArr(prvData, prvArr, setPrvArr);
 		await countArr(data, Arr, setArr);
 		countDifferentBits(Arr, prvArr);
-	};
+	}
 
 	function countDifferentBits(arr1, arr2) {
 		const differencesInBits = [];
@@ -65,7 +66,19 @@ const App = () => {
 		countDifferentBits(Arr, prvArr);
 	}
 
-	console.log(text, "---------", textArea);
+	function downloadTextFile(text) {
+		const blob = new Blob([text], { type: "text/plain" });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = "my-text-file.txt";
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+	}
+
+	// console.log(text, "---------", textArea);
 
 	return (
 		<div className="main">
@@ -76,15 +89,19 @@ const App = () => {
 					<textarea value={text} onChange={handleInputChange} />
 					{<p>Number of changed bits :{bitCount.join(" - ")}</p>}
 				</div>
-
-				{/* <h2>{splited}</h2> */}
 				<button
+					onClick={() => {
+						downloadTextFile(data);
+					}}
 					onMouseLeave={() => setIsHovering(false)}
 					onMouseEnter={() => setIsHovering(true)}>
 					{isHovering
-						? "Well! i'm useless, we do auto generating rn"
+						? "Sava the Hash"
 						: "Convert to md5"}
 				</button>
+			</div>
+			<div className="Chart">
+				<MyChart hash={data} Arr={Arr} />
 			</div>
 		</div>
 	);
