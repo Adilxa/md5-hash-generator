@@ -1,0 +1,26 @@
+.textarea-container {
+  margin-top: 20px;
+  display: inline-block;
+  position: relative;
+}
+
+textarea {
+  border: 1px solid gray;
+  padding: 10px;
+  font-size: 16px;
+  outline: none;
+  /* resize: none; */
+  transition: height 0.2s ease-in-out;
+  box-sizing: border-box;
+  min-width: 600px;
+  width: 100%;
+  min-height: 120px;
+}
+
+textarea:focus {
+  border-color: #007bff;
+}
+
+textarea::placeholder {
+  color: gray;
+}
