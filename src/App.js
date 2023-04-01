@@ -3,61 +3,50 @@ import { useState, useEffect } from "react";
 import "./App.scss";
 
 const App = () => {
-	const [prvData, setPrvData] = useState("");
-	const [data, setData] = useState(""); // is for md5
+	const [prvData, setPrvData] = useState("00000000000000000000000000000000"); // prev data
+	const [prvArr, setPrvArr] = useState([]);
+	const [data, setData] = useState("00000000000000000000000000000000"); // is for md5
+	const [Arr, setArr] = useState([]); // the Arr for the graph and bit count. 
 	const [text, setText] = useState(); // is for the text
 	const [textArea, setTextArea] = useState();
 	const [isHovering, setIsHovering] = useState(false);
-	const [bitCount, setBitCount] = useState(0);
+	const [bitCount, setBitCount] = useState([]);
 
-	// TODO: when the program is running, it should be possible to view and change
-	// the message read from the file and the calculated value of the hash function.
+	useEffect(() => {
+		onSave(text);
+		console.log(data, "----", prvData);
+	});
 
-	const handleInputChange = (event) => {
-    setBitCount(countDifferentBits(data, prvData));
+	async function countArr(hash, sums, handeler) {
+		sums = [];
+		for (let i = 0; i < 8; i++) {
+			let sum = 0;
+			for (let j = 0; j < 4; j++) {
+				sum += parseInt(hash[i * 4 + j], 16);
+			}
+			sums.push(sum);
+		}
+		await handeler(sums);
+	}
+	console.log(prvArr, "---------", Arr);
+	async function handleInputChange (event) {
+		setPrvData(data); // Store the previous hash value.
 		setTextArea(event.target.value);
 		setText(event.target.value);
+
+		await countArr(prvData, prvArr, setPrvArr);
+		await countArr(data, Arr, setArr);
+		countDifferentBits(Arr, prvArr);
 	};
 
-	//DONE;
+	function countDifferentBits(arr1, arr2) {
+		const differencesInBits = [];
+		for (let i = 0; i < arr1.length; i++) {
+			differencesInBits.push(Math.abs(arr1[i] - arr2[i]));
+		}
+		setBitCount(differencesInBits);
+	}
 
-	// TODO: for a bit that will change, the application must allow you to set its position (number) in the message; -- rami
-
-
-  
-	// TODO: after each round (iteration of the loop) calculation of the hash function, the application must be able
-	// to count the number of bits that have changed in the hash when one bit is changed -- rami
-	useEffect(() => {
-		setPrvData(data); // Store the previous hash value.
-		onSave(text);
-	}, [text]);
-
-  function countDifferentBits(prevHash, newHash) {
-    const prevBinary = hexToBinary(prevHash);
-    const newBinary = hexToBinary(newHash);
-    let count = 0;
-    for (let i = 0; i < prevBinary.length; i++) {
-      if (prevBinary[i] !== newBinary[i]) {
-        count++;
-      }
-    }
-    return count;
-  }
-  
-  function hexToBinary(hex) {
-    const hexStr = hex.toString();
-    let binStr = "";
-    for (let i = 0; i < hexStr.length; i += 2) {
-      const hexByte = hexStr.substr(i, 2);
-      const byte = parseInt(hexByte, 16);
-      binStr += byte.toString(2).padStart(8, "0");
-    }
-    return binStr;
-  }
-
-	// Done; 
-
-  
 	const onSave = (data) => {
 		const hash = CryptoJS.MD5(data).toString();
 		setData(hash);
@@ -70,12 +59,13 @@ const App = () => {
 			setText(event.target.result);
 		};
 		reader.readAsText(file);
-	};
 
+		countArr(prvData, prvArr, setPrvArr);
+		countArr(data, Arr, setArr);
+		countDifferentBits(Arr, prvArr);
+	}
 
-  
-
-  console.log(text, "---------", textArea);
+	console.log(text, "---------", textArea);
 
 	return (
 		<div className="main">
@@ -84,7 +74,7 @@ const App = () => {
 				<h1>md5: {data}</h1>
 				<div className="textarea-container">
 					<textarea value={text} onChange={handleInputChange} />
-          {bitCount > 0 && <p>Number of changed bits: {bitCount}</p>}
+					{<p>Number of changed bits :{bitCount.join(" - ")}</p>}
 				</div>
 
 				{/* <h2>{splited}</h2> */}
@@ -95,7 +85,6 @@ const App = () => {
 						? "Well! i'm useless, we do auto generating rn"
 						: "Convert to md5"}
 				</button>
-        
 			</div>
 		</div>
 	);
